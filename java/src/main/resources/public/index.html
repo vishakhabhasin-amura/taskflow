@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TaskFlow</title>
+  <style>
+    body { font-family: sans-serif; max-width: 480px; margin: 40px auto; }
+    li.completed span { text-decoration: line-through; color: #888; }
+    li { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+    li span { flex: 1; }
+  </style>
+</head>
+<body>
+  <h1>TaskFlow</h1>
+  <form id="task-form">
+    <input id="title-input" type="text" placeholder="New task" required />
+    <button type="submit">Add</button>
+  </form>
+  <ul id="task-list"></ul>
+  <script src="app.js"></script>
+</body>
+</html>
