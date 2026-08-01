@@ -1,9 +1,6 @@
 node_modules/
 .DS_Store
 
-# Sealed reference material — never pushed, local only
-fallback/
-
 # Java
 java/target/
 *.class
