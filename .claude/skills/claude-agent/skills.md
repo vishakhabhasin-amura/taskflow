@@ -365,3 +365,117 @@ no critical accessibility blockers.
   where not (A/B): pre-registered, no peeking.
 - Evidence for every failure (request + actual result); ambiguities are findings.
 - Never edit the app under test to make a test pass.
+
+
+# Quality Gates & PR Workflow — standards, gates, protocols
+
+Reference for the `claude-agent` skill. Governs the SDLC process the testing
+agent enforces: what must be true *before* code reaches testing, how the agent
+generates tests, the hard gate that decides whether a PR may be raised, the
+triage loop when it fails, and the PR description standard. These gates sit on
+top of the disciplines in `references/testing-disciplines.md`.
+
+---
+
+## 1. Implementation Pre-Handoff Checklist
+
+Before implementation code is handed off to the testing phase or AI agent, it
+must pass these non-negotiable baseline checks:
+
+- **Execution:** Code compiles and runs cleanly without syntax or runtime errors.
+- **Scope Discipline:** Builds strictly what the specification defines — zero
+  extra features, unrequested refactors, or scope creep.
+- **Style Compliance:** Adheres to established codebase conventions and patterns;
+  introduces no arbitrary architectural drift.
+- **Regression Protection:** All pre-existing baseline unit and module tests
+  continue to pass without modification.
+- **Minimal Footprint:** Code changes are tightly constrained to the minimum
+  necessary files.
+
+---
+
+## 2. AI Test Generation Framework & Prompting Rules
+
+Guidelines for feeding implementation code and paper-designed testing specs into
+an AI agent:
+
+- **Acceptance Mapping:** Map every single acceptance criterion from the product
+  specification to at least one explicit test case.
+- **Mandatory Edge-Case Taxonomy:**
+  - *Missing / Optional Values:* Verify behavior when optional parameters or
+    fields are omitted (e.g., `due_date = null`).
+  - *Temporal & Numerical Boundaries:* Verify exact boundary conditions (e.g.,
+    tasks due exactly today, zero balances, max integer limits).
+  - *Invalid State Transitions:* Verify that illegal state changes are caught
+    gracefully.
+
+---
+
+## 3. Quality Gate & PR Decision Rules
+
+The hard criteria governing whether code is allowed to be submitted as a Pull
+Request (PR).
+
+```
+                     +---------------------------+
+                     | Execute Test Suite Gate   |
+                     +-------------+-------------+
+                                   |
+                         [ All Tests Pass? ]
+                            /         \
+                       YES /           \ NO
+                          v             v
+             +-----------------+   +-------------------------+
+             |  RAISE PULL     |   |  BLOCK PULL REQUEST     |
+             |  REQUEST (PR)   |   |  Generate Failure Report|
+             +-----------------+   +------------+------------+
+                                                |
+                                                v
+                                   +-------------------------+
+                                   | Handoff to Dev Team for |
+                                   | Diagnosis & Fix         |
+                                   +-------------------------+
+```
+
+- **Binary Gate Policy:**
+  - *PR Raised:* Allowed only if 100% of generated acceptance tests, edge-case
+    tests, and regression tests pass against the target build.
+  - *PR Blocked:* If any test fails, the PR is strictly blocked. No partial
+    merges or "fix later" exceptions.
+
+---
+
+## 4. Failure Triage & Re-Testing Protocol
+
+Standard operating procedure when a Quality Gate fails:
+
+1. **Failure Report Generation:** The testing agent/sub-team writes a precise,
+   structured report detailing:
+   - Failing Test Name & Target Endpoint/Function
+   - Expected Behavior vs. Actual Behavior
+   - Exact HTTP Payload / Request and Full Error Response (with reproduction
+     steps)
+2. **Handoff Back to Implementation:** Send the report directly back to the
+   development team for root-cause diagnosis.
+3. **Re-Gate Verification:** Once implementation pushes a fix, the testing team
+   re-executes the complete gate suite from Step 1.
+
+---
+
+## 5. Standardized PR Description Template
+
+When the Quality Gate passes, every Pull Request must be created with the
+following standardized structure:
+
+```markdown
+## Summary of Changes
+- Concise list of files modified and functionality added/fixed.
+
+## Testing Verification
+- [x] All acceptance criteria tests passing.
+- [x] Edge cases verified (missing optional fields, exact boundaries).
+- [x] Existing regression tests passing.
+
+## Known Limitations & Findings
+- Any non-blocking findings, technical debt, or contract ambiguities discovered during testing.
+```
