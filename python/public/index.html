@@ -2,20 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TaskFlow</title>
   <style>
+    :root {
+      --color-due-text: #45505c;
+      --color-overdue-text: #a1201a;
+      --color-overdue-surface: #fdecea;
+      --color-overdue-border: #f0bdb8;
+      --color-error-text: #a1201a;
+      --gap-row: 0.5rem;
+      --font-scale-small: 0.85rem;
+    }
     body { font-family: sans-serif; max-width: 480px; margin: 40px auto; }
     li.completed span { text-decoration: line-through; color: #888; }
     li { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
     li span { flex: 1; }
+
+    #task-form { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-row); }
+    #title-input { flex: 1 1 10rem; min-width: 0; }
+    #task-form label { font-size: var(--font-scale-small); color: var(--color-due-text); }
+
+    #form-error {
+      margin: var(--gap-row) 0 0;
+      font-size: var(--font-scale-small);
+      color: var(--color-error-text);
+    }
+
+    li .due-date {
+      flex: 0 0 auto;
+      font-size: var(--font-scale-small);
+      color: var(--color-due-text);
+      white-space: nowrap;
+    }
+    li .overdue-badge {
+      flex: 0 0 auto;
+      font-size: var(--font-scale-small);
+      color: var(--color-overdue-text);
+      background: var(--color-overdue-surface);
+      border: 1px solid var(--color-overdue-border);
+      border-radius: 0.25em;
+      padding: 0.1em 0.4em;
+    }
+    li.overdue .due-date { color: var(--color-overdue-text); font-weight: 600; }
   </style>
 </head>
 <body>
   <h1>TaskFlow</h1>
   <form id="task-form">
     <input id="title-input" type="text" placeholder="New task" required />
+    <label for="due-date-input">Due date (optional)</label>
+    <input id="due-date-input" type="date" />
     <button type="submit">Add</button>
   </form>
+  <p id="form-error" role="alert" hidden></p>
   <ul id="task-list"></ul>
   <script src="app.js"></script>
 </body>
