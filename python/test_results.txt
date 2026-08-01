@@ -1,0 +1,148 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- /Users/rahulsiddharthdacha/.pyenv/versions/3.14.0/bin/python3.14
+cachedir: .pytest_cache
+rootdir: /Users/rahulsiddharthdacha/Desktop/PersonalProjects/AmuraHealth/taskflow/python
+configfile: pyproject.toml
+plugins: langsmith-0.8.9, anyio-4.13.0
+collecting ... collected 21 items
+
+tests/test_due_dates.py::test_create_task_with_due_date_returns_201_and_stored_date FAILED [  4%]
+tests/test_due_dates.py::test_create_task_without_due_date_field_defaults_to_null PASSED [  9%]
+tests/test_due_dates.py::test_create_task_with_explicit_null_due_date_is_valid PASSED [ 14%]
+tests/test_due_dates.py::test_create_task_with_due_date_preserves_title_and_completed_defaults FAILED [ 19%]
+tests/test_due_dates.py::test_patch_adds_due_date_to_undated_task FAILED [ 23%]
+tests/test_due_dates.py::test_patch_due_date_response_contains_all_task_fields FAILED [ 28%]
+tests/test_due_dates.py::test_patch_due_date_is_reflected_in_subsequent_get FAILED [ 33%]
+tests/test_due_dates.py::test_patch_due_date_rejected_when_already_set PASSED [ 38%]
+tests/test_due_dates.py::test_patch_due_date_rejected_returns_correct_error_body PASSED [ 42%]
+tests/test_due_dates.py::test_patch_due_date_rejected_even_when_same_value PASSED [ 47%]
+tests/test_due_dates.py::test_patch_completed_does_not_modify_due_date FAILED [ 52%]
+tests/test_due_dates.py::test_patch_due_date_still_rejected_after_task_is_completed PASSED [ 57%]
+tests/test_due_dates.py::test_get_tasks_sorted_by_due_date_ascending PASSED [ 61%]
+tests/test_due_dates.py::test_get_tasks_null_due_dates_sorted_after_all_dated_tasks PASSED [ 66%]
+tests/test_due_dates.py::test_get_tasks_null_group_preserves_insertion_order PASSED [ 71%]
+tests/test_due_dates.py::test_get_tasks_overdue_task_appears_before_future_task PASSED [ 76%]
+tests/test_due_dates.py::test_get_tasks_due_today_sorts_before_future_and_after_overdue PASSED [ 80%]
+tests/test_due_dates.py::test_get_tasks_mixed_dated_and_undated_full_sort_order PASSED [ 85%]
+tests/test_due_dates.py::test_create_task_response_always_includes_due_date_field PASSED [ 90%]
+tests/test_due_dates.py::test_get_all_tasks_response_includes_due_date_on_every_task PASSED [ 95%]
+tests/test_due_dates.py::test_patch_response_includes_due_date_field PASSED [100%]
+
+=================================== FAILURES ===================================
+__________ test_create_task_with_due_date_returns_201_and_stored_date __________
+
+client = <FlaskClient <Flask 'app'>>
+
+    def test_create_task_with_due_date_returns_201_and_stored_date(client):
+        """Spec Scenario 1 — POST with due_date stores the date and returns 201."""
+        res = client.post("/tasks", json={"title": "Submit report", "due_date": TOMORROW})
+        assert res.status_code == 201
+>       assert res.json["due_date"] == TOMORROW
+E       AssertionError: assert '2026-08-02T00:00:00+05:30' == '2026-08-02'
+E         
+E         - 2026-08-02
+E         + 2026-08-02T00:00:00+05:30
+
+tests/test_due_dates.py:43: AssertionError
+____ test_create_task_with_due_date_preserves_title_and_completed_defaults _____
+
+client = <FlaskClient <Flask 'app'>>
+
+    def test_create_task_with_due_date_preserves_title_and_completed_defaults(client):
+        """AC-1 + AC-6 — Response includes all four fields with correct defaults."""
+        res = client.post("/tasks", json={"title": "Code review", "due_date": NEXT_WEEK})
+        body = res.json
+        assert body["title"] == "Code review"
+        assert body["completed"] is False
+>       assert body["due_date"] == NEXT_WEEK
+E       AssertionError: assert '2026-08-08T00:00:00+05:30' == '2026-08-08'
+E         
+E         - 2026-08-08
+E         + 2026-08-08T00:00:00+05:30
+
+tests/test_due_dates.py:66: AssertionError
+___________________ test_patch_adds_due_date_to_undated_task ___________________
+
+client = <FlaskClient <Flask 'app'>>
+
+    def test_patch_adds_due_date_to_undated_task(client):
+        """Spec Scenario 2 step 2 — PATCH due_date on a null-dated task succeeds."""
+        created = client.post("/tasks", json={"title": "Buy groceries"})
+        task_id = created.json["id"]
+    
+        res = client.patch(f"/tasks/{task_id}", json={"due_date": YESTERDAY})
+        assert res.status_code == 200
+>       assert res.json["due_date"] == YESTERDAY
+E       AssertionError: assert '2026-07-31T00:00:00+05:30' == '2026-07-31'
+E         
+E         - 2026-07-31
+E         + 2026-07-31T00:00:00+05:30
+
+tests/test_due_dates.py:81: AssertionError
+____________ test_patch_due_date_response_contains_all_task_fields _____________
+
+client = <FlaskClient <Flask 'app'>>
+
+    def test_patch_due_date_response_contains_all_task_fields(client):
+        """AC-2 response must include id, title, completed, and due_date."""
+        created = client.post("/tasks", json={"title": "Team sync"})
+        task_id = created.json["id"]
+    
+        res = client.patch(f"/tasks/{task_id}", json={"due_date": TOMORROW})
+        body = res.json
+        assert "id" in body
+        assert body["title"] == "Team sync"
+        assert body["completed"] is False
+>       assert body["due_date"] == TOMORROW
+E       AssertionError: assert '2026-08-02T00:00:00+05:30' == '2026-08-02'
+E         
+E         - 2026-08-02
+E         + 2026-08-02T00:00:00+05:30
+
+tests/test_due_dates.py:94: AssertionError
+______________ test_patch_due_date_is_reflected_in_subsequent_get ______________
+
+client = <FlaskClient <Flask 'app'>>
+
+    def test_patch_due_date_is_reflected_in_subsequent_get(client):
+        """AC-2 — After PATCH, GET /tasks returns the updated due_date."""
+        created = client.post("/tasks", json={"title": "Prepare slides"})
+        task_id = created.json["id"]
+        client.patch(f"/tasks/{task_id}", json={"due_date": NEXT_WEEK})
+    
+        tasks = client.get("/tasks").json
+        match = next(t for t in tasks if t["id"] == task_id)
+>       assert match["due_date"] == NEXT_WEEK
+E       AssertionError: assert '2026-08-08T00:00:00+05:30' == '2026-08-08'
+E         
+E         - 2026-08-08
+E         + 2026-08-08T00:00:00+05:30
+
+tests/test_due_dates.py:105: AssertionError
+________________ test_patch_completed_does_not_modify_due_date _________________
+
+client = <FlaskClient <Flask 'app'>>
+
+    def test_patch_completed_does_not_modify_due_date(client):
+        """Spec Scenario 5 — Toggling completed leaves due_date untouched."""
+        created = client.post("/tasks", json={"title": "File taxes", "due_date": NEXT_WEEK})
+        task_id = created.json["id"]
+    
+        res = client.patch(f"/tasks/{task_id}", json={"completed": True})
+        assert res.status_code == 200
+        assert res.json["completed"] is True
+>       assert res.json["due_date"] == NEXT_WEEK
+E       AssertionError: assert '2026-08-08T00:00:00+05:30' == '2026-08-08'
+E         
+E         - 2026-08-08
+E         + 2026-08-08T00:00:00+05:30
+
+tests/test_due_dates.py:147: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_due_dates.py::test_create_task_with_due_date_returns_201_and_stored_date
+FAILED tests/test_due_dates.py::test_create_task_with_due_date_preserves_title_and_completed_defaults
+FAILED tests/test_due_dates.py::test_patch_adds_due_date_to_undated_task - As...
+FAILED tests/test_due_dates.py::test_patch_due_date_response_contains_all_task_fields
+FAILED tests/test_due_dates.py::test_patch_due_date_is_reflected_in_subsequent_get
+FAILED tests/test_due_dates.py::test_patch_completed_does_not_modify_due_date
+========================= 6 failed, 15 passed in 0.09s =========================
