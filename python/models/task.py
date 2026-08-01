@@ -1,10 +1,12 @@
+from datetime import date
+
 _tasks = []
 _next_id = 1
 
 
-def create_task(title):
+def create_task(title, due_date=None):
     global _next_id
-    task = {"id": _next_id, "title": title, "completed": False}
+    task = {"id": _next_id, "title": title, "completed": False, "dueDate": due_date}
     _next_id += 1
     _tasks.append(task)
     return task
@@ -12,6 +14,16 @@ def create_task(title):
 
 def get_tasks():
     return _tasks
+
+
+def is_overdue(task):
+    if not task["dueDate"] or task["completed"]:
+        return False
+    return task["dueDate"] < date.today().isoformat()
+
+
+def sorted_by_due_date(tasks):
+    return sorted(tasks, key=lambda t: (not t["dueDate"], t["dueDate"] or ""))
 
 
 def get_task(task_id):

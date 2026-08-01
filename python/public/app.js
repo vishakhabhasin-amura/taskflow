@@ -13,6 +13,7 @@ function renderTasks(tasks) {
   for (const task of tasks) {
     const li = document.createElement('li');
     li.className = task.completed ? 'completed' : '';
+    if (task.isOverdue) li.classList.add('overdue');
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -22,11 +23,15 @@ function renderTasks(tasks) {
     const span = document.createElement('span');
     span.textContent = task.title;
 
+    const due = document.createElement('span');
+    due.className = 'due';
+    due.textContent = task.dueDate || '';
+
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
     deleteBtn.addEventListener('click', () => deleteTask(task.id));
 
-    li.append(checkbox, span, deleteBtn);
+    li.append(checkbox, span, due, deleteBtn);
     list.appendChild(li);
   }
 }
