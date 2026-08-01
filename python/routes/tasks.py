@@ -1,6 +1,13 @@
 from flask import Blueprint, jsonify, request
 
-from models.task import create_task, delete_task, get_tasks, update_task
+from models.task import (
+    create_task,
+    delete_task,
+    get_task,
+    get_tasks,
+    set_due_date,
+    update_task,
+)
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -12,19 +19,32 @@ def list_tasks():
 
 @tasks_bp.post("")
 def add_task():
-    title = (request.get_json(silent=True) or {}).get("title")
+    body = request.get_json(silent=True) or {}
+    title = body.get("title")
     if not title:
         return jsonify({"error": "title is required"}), 400
-    return jsonify(create_task(title)), 201
+    # due_date is optional; absent -> None (stored as null).
+    return jsonify(create_task(title, body.get("due_date"))), 201
 
 
 @tasks_bp.patch("/<int:task_id>")
 def patch_task(task_id):
-    completed = (request.get_json(silent=True) or {}).get("completed")
-    task = update_task(task_id, bool(completed))
+    task = get_task(task_id)
     if task is None:
         return jsonify({"error": "task not found"}), 404
-    return jsonify(task)
+
+    body = request.get_json(silent=True) or {}
+
+    if "due_date" in body:
+        # Immutable once set: reject any attempt to supply due_date when one exists.
+        if task["due_date"] is not None:
+            return jsonify({"error": "due_date cannot be changed once set"}), 400
+        set_due_date(task_id, body["due_date"])
+
+    if "completed" in body:
+        update_task(task_id, bool(body["completed"]))
+
+    return jsonify(get_task(task_id))
 
 
 @tasks_bp.delete("/<int:task_id>")

@@ -173,3 +173,4 @@ Tasks gain an optional due date. Once set, a due date is permanent. The task lis
 - [x] **OQ-1 through OQ-3** — open questions flagged for a human to decide before implementation
 - [x] **Files affected** — listed per stack with specific change description
 - [x] **Scenarios 1–5** — five scenarios with specific inputs and expected outputs (exceeds minimum of 3)
+ 
