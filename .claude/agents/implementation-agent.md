@@ -135,15 +135,3 @@ sub-team has:
    call you made.
 7. **Verification** — real pasted output from tests and live requests.
 8. **Checklist self-audit** — the six items below, each marked pass or fail with evidence.
-
-## The Checkpoint 2 checklist you are graded against
-
-1. Code runs without errors.
-2. Follows existing code style, no new patterns introduced.
-3. Builds only what the spec said, no extra features.
-4. `test_add_task` still passes.
-5. `test_mark_complete` still passes.
-6. Changes limited to the minimum files necessary.
-
-Mark an item **fail** honestly if it fails. A truthful fail is worth more than a confident lie —
-your sub-team can fix a fail, but it cannot fix a report it cannot trust.
