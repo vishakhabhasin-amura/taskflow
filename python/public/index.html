@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TaskFlow</title>
+  <style>
+    body { font-family: sans-serif; max-width: 520px; margin: 40px auto; }
+    li { display: flex; align-items: center; gap: 8px; margin: 6px 0; padding-left: 6px; border-left: 4px solid transparent; }
+    li.completed span.title { text-decoration: line-through; color: #888; }
+    li.overdue { border-left-color: red; }
+    li span.title { flex: 1; }
+    .due-date { color: #555; font-size: 0.9em; }
+    .add-due-date-input { width: 190px; }
+  </style>
+</head>
+<body>
+  <h1>TaskFlow</h1>
+  <form id="task-form">
+    <input id="title-input" type="text" placeholder="New task" required />
+    <label>Due date <input id="due-date-input" type="datetime-local" /></label>
+    <button type="submit">Add</button>
+  </form>
+  <ul id="task-list"></ul>
+  <script src="app.js"></script>
+</body>
+</html>
